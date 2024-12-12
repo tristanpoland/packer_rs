@@ -261,7 +261,6 @@ impl Packer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
     use tempfile::TempDir;
 
     // Helper function to create a test environment
@@ -333,7 +332,7 @@ mod tests {
             working_dir: None,
         };
 
-        let options = BuildOptionsBuilder::default()
+        let _options = BuildOptionsBuilder::default()
             .debug(true)
             .force(true)
             .parallel_builds(Some(2))
