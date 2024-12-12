@@ -1,0 +1,19 @@
+[package]
+name = "packer_rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tristan J. Poland <redstonecrafter126@gmail.com>"]
+description = "A Rust wrapper for HashiCorp Packer CLI"
+license = "Apache 2.0"
+repository = "https://github.com/tristanpoland/packer_rs"
+documentation = "https://docs.rs/packer_rs"
+readme = "README.md"
+keywords = ["packer", "hashicorp", "infrastructure", "automation"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+derive_builder = "0.20.2"
+thiserror = "1.0"
+
+[dev-dependencies]
+tempfile = "3.8"
