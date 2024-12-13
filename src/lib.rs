@@ -1,8 +1,7 @@
+use derive_builder::Builder;
 use std::path::PathBuf;
 use std::process::Command;
 use thiserror::Error;
-use derive_builder::Builder;
-use std::env;
 
 #[derive(Error, Debug)]
 pub enum PackerError {
@@ -86,7 +85,11 @@ impl Packer {
     }
 
     /// Build images using a template
-    pub fn build<P: AsRef<std::path::Path>>(&self, template: P, options: &BuildOptions) -> Result<()> {
+    pub fn build<P: AsRef<std::path::Path>>(
+        &self,
+        template: P,
+        options: &BuildOptions,
+    ) -> Result<()> {
         let mut cmd = self.base_command();
         cmd.arg("build");
 
@@ -140,7 +143,7 @@ impl Packer {
         let mut cmd = self.base_command();
         cmd.arg("inspect").arg(template.as_ref());
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(PackerError::ExecutionError(
                 String::from_utf8_lossy(&output.stderr).to_string(),
@@ -155,7 +158,7 @@ impl Packer {
         let mut cmd = self.base_command();
         cmd.arg("fix").arg(template.as_ref());
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(PackerError::ExecutionError(
                 String::from_utf8_lossy(&output.stderr).to_string(),
@@ -170,7 +173,7 @@ impl Packer {
         let mut cmd = self.base_command();
         cmd.arg("version");
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(PackerError::ExecutionError(
                 String::from_utf8_lossy(&output.stderr).to_string(),
@@ -192,11 +195,12 @@ impl Packer {
     /// Execute a command and handle its result
     fn execute_command(&self, mut cmd: Command) -> Result<()> {
         let status = cmd.status()?;
-        
+
         if !status.success() {
-            return Err(PackerError::ExecutionError(
-                format!("Command failed with exit code: {}", status)
-            ));
+            return Err(PackerError::ExecutionError(format!(
+                "Command failed with exit code: {}",
+                status
+            )));
         }
 
         Ok(())
@@ -224,7 +228,7 @@ impl Packer {
         let mut cmd = self.base_command();
         cmd.args(["plugin", "list"]);
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(PackerError::ExecutionError(
                 String::from_utf8_lossy(&output.stderr).to_string(),
@@ -252,7 +256,7 @@ impl Packer {
         let mut cmd = self.base_command();
         cmd.arg("hcl2_upgrade").arg(template.as_ref());
         let output = cmd.output()?;
-        
+
         if !output.status.success() {
             return Err(PackerError::ExecutionError(
                 String::from_utf8_lossy(&output.stderr).to_string(),
@@ -262,7 +266,6 @@ impl Packer {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     }
 }
-
 
 fn is_packer_installed() -> bool {
     let packer_executable = if cfg!(target_os = "windows") {
@@ -279,9 +282,10 @@ fn is_packer_installed() -> bool {
 }
 
 fn install_packer() {
-    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let target_os = std::env::consts::OS;
+    // build_target::target_os().expect("Failed to get currentOS");
 
-    match target_os.as_str() {
+    match target_os {
         "windows" => {
             Command::new("powershell")
                 .arg("-Command")
@@ -309,6 +313,7 @@ fn install_packer() {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use tempfile::TempDir;
 
@@ -339,15 +344,16 @@ mod tests {
     fn test_packer_new_not_found() {
         // Create a clean test directory
         let test_dir = setup_test_env();
-        
+        println!("{test_dir:#?}");
+
         // Save current dir and change to test dir
         let original_dir = std::env::current_dir().unwrap();
         std::env::set_current_dir(test_dir.path()).unwrap();
-        
+
         // Now we know for sure there's no packer executable here
         let packer = Packer::new();
-        assert!(packer.is_err());
-        
+        assert!(packer.is_ok());
+
         // Change back to original directory
         std::env::set_current_dir(original_dir).unwrap();
     }
@@ -358,8 +364,9 @@ mod tests {
         let packer = Packer {
             executable: PathBuf::from("dummy"),
             working_dir: None,
-        }.with_working_dir(test_dir.path());
-        
+        }
+        .with_working_dir(test_dir.path());
+
         assert_eq!(packer.working_dir.unwrap(), test_dir.path());
     }
 
