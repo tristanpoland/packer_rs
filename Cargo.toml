@@ -1,6 +1,6 @@
 [package]
 name = "packer_rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Tristan J. Poland <redstonecrafter126@gmail.com>"]
 description = "A Rust wrapper for HashiCorp Packer CLI"
