@@ -1,6 +1,6 @@
 [package]
 name = "packer_rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Tristan J. Poland <redstonecrafter126@gmail.com>"]
 description = "A Rust wrapper for HashiCorp Packer CLI"
@@ -14,7 +14,8 @@ categories = ["command-line-utilities", "development-tools"]
 [dependencies]
 build-target = "0.4.0"
 derive_builder = "0.20.2"
-thiserror = "1.0"
+thiserror = "2.0.9"
+zip-extract = "0.2.1"
 
 [dev-dependencies]
 tempfile = "3.8"
