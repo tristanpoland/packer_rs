@@ -1,5 +1,6 @@
 use derive_builder::Builder;
-use std::path::PathBuf;
+use std::io::Cursor;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use thiserror::Error;
 
@@ -289,26 +290,28 @@ fn install_packer() {
         "windows" => {
             Command::new("powershell")
                 .arg("-Command")
-                .arg("Invoke-WebRequest -Uri https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_windows_amd64.zip -OutFile packer.zip; Expand-Archive -Path packer.zip -DestinationPath .;")
+                .arg("Invoke-WebRequest -Uri https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_windows_amd64.zip -OutFile packer.zip")
                 .status()
                 .expect("Failed to install Packer on Windows");
         }
         "macos" => {
             Command::new("sh")
                 .arg("-c")
-                .arg("curl -o packer.zip https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_darwin_amd64.zip && unzip packer.zip")
+                .arg("curl -o packer.zip https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_darwin_amd64.zip")
                 .status()
                 .expect("Failed to install Packer on macOS");
         }
         "linux" => {
             Command::new("sh")
                 .arg("-c")
-                .arg("curl -o packer.zip https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_linux_amd64.zip && unzip packer.zip")
+                .arg("curl -o packer.zip https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_linux_amd64.zip")
                 .status()
                 .expect("Failed to install Packer on Linux");
         }
         _ => panic!("Unsupported OS"),
     }
+    let packer_zip = std::fs::read("packer.zip").expect("Failed to read packer.zip");
+    zip_extract::extract(Cursor::new(packer_zip), Path::new("."), true).expect("Failed to extract packer.zip");
 }
 
 #[cfg(test)]
